@@ -1,0 +1,43 @@
+category,element,metric,value,unit,time_of_max(day hr:min)
+continuity,runoff,continuity_error,-0.077,%,
+continuity,flow_routing,continuity_error,0.010,%,
+system,rainfall,total_precipitation,3.669,in,
+system,rainfall,total_precipitation_volume,8.843,ac-ft,
+system,runoff,total_surface_runoff,3.036,in,
+system,runoff,total_surface_runoff_volume,7.317,ac-ft,
+outfall,O1,peak_flow,164.13,CFS,
+outfall,O1,total_volume,2.382,10^6 gal,
+link,C1,max_flow,37.27,CFS,0 00:35
+link,C2,max_flow,36.97,CFS,0 00:35
+link,C3,max_flow,28.51,CFS,0 00:35
+link,C4,max_flow,27.90,CFS,0 00:35
+link,C5,max_flow,57.02,CFS,0 00:35
+link,C6,max_flow,54.62,CFS,0 00:35
+link,C7,max_flow,103.23,CFS,0 00:35
+link,C8,max_flow,102.59,CFS,0 00:36
+link,C9,max_flow,95.16,CFS,0 00:37
+link,C10,max_flow,126.93,CFS,0 00:38
+link,C11,max_flow,164.13,CFS,0 00:38
+node_flooding,J1,total_flood_volume,0.000,10^6 gal,
+node_flooding,J2,total_flood_volume,0.000,10^6 gal,
+node_flooding,J3,total_flood_volume,0.000,10^6 gal,
+node_flooding,J4,total_flood_volume,0.000,10^6 gal,
+node_flooding,J5,total_flood_volume,0.000,10^6 gal,
+node_flooding,J6,total_flood_volume,0.000,10^6 gal,
+node_flooding,J7,total_flood_volume,0.000,10^6 gal,
+node_flooding,J8,total_flood_volume,0.000,10^6 gal,
+node_flooding,J9,total_flood_volume,0.000,10^6 gal,
+node_flooding,J10,total_flood_volume,0.000,10^6 gal,
+node_flooding,J11,total_flood_volume,0.000,10^6 gal,
+node_depth,J1,max_depth,1.12,ft,0 00:35
+node_depth,J2,max_depth,0.95,ft,0 00:35
+node_depth,J3,max_depth,1.57,ft,0 00:35
+node_depth,J4,max_depth,1.14,ft,0 00:35
+node_depth,J5,max_depth,1.98,ft,0 00:35
+node_depth,J6,max_depth,2.30,ft,0 00:35
+node_depth,J7,max_depth,1.33,ft,0 00:35
+node_depth,J8,max_depth,2.02,ft,0 00:36
+node_depth,J9,max_depth,2.58,ft,0 00:37
+node_depth,J10,max_depth,2.91,ft,0 00:38
+node_depth,J11,max_depth,3.33,ft,0 00:37
+node_depth,O1,max_depth,3.33,ft,0 00:38

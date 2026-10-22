@@ -1,0 +1,13 @@
+aenum==3.1.17
+colorama==0.4.6
+julian==0.14
+numpy==2.5.4
+packaging==26.3
+pandas==3.1.0
+pyswmm==2.2.0
+python-dateutil==3.0.0
+six==1.17.0
+swmm-api==0.4.74
+swmm-toolkit==0.17.0
+tqdm==4.70.1
+tzdata==2026.5

@@ -1,0 +1,40 @@
+category,element,metric,value,unit,time_of_max(day hr:min)
+continuity,runoff,continuity_error,-0.07690981850718703,%,
+continuity,flow_routing,continuity_error,0.010184610788277482,%,
+system,rainfall,total_precipitation,3.6691666666666745,in,
+system,runoff,total_surface_runoff,3.0363049342713113,in,
+outfall,O1,peak_flow,164.12898651201752,CFS,
+link,C1,max_flow,37.2670689104712,CFS,0 00:35
+link,C2,max_flow,36.96533697402849,CFS,0 00:35
+link,C3,max_flow,28.509396455787048,CFS,0 00:35
+link,C4,max_flow,27.895095273726803,CFS,0 00:35
+link,C5,max_flow,57.02106543185701,CFS,0 00:35
+link,C6,max_flow,54.61915431191022,CFS,0 00:35
+link,C7,max_flow,103.22757440625779,CFS,0 00:35
+link,C8,max_flow,102.59116320256187,CFS,0 00:36
+link,C9,max_flow,95.16093512952804,CFS,0 00:37
+link,C10,max_flow,126.9318002294197,CFS,0 00:38
+link,C11,max_flow,164.12898651201752,CFS,0 00:38
+node_flooding,J1,total_flood_volume,0.0,10^6 gal,
+node_flooding,J2,total_flood_volume,0.0,10^6 gal,
+node_flooding,J3,total_flood_volume,0.0,10^6 gal,
+node_flooding,J4,total_flood_volume,0.0,10^6 gal,
+node_flooding,J5,total_flood_volume,0.0,10^6 gal,
+node_flooding,J6,total_flood_volume,0.0,10^6 gal,
+node_flooding,J7,total_flood_volume,0.0,10^6 gal,
+node_flooding,J8,total_flood_volume,0.0,10^6 gal,
+node_flooding,J9,total_flood_volume,0.0,10^6 gal,
+node_flooding,J10,total_flood_volume,0.0,10^6 gal,
+node_flooding,J11,total_flood_volume,0.0,10^6 gal,
+node_depth,J1,max_depth,1.118409535383437,ft,0 00:35
+node_depth,J2,max_depth,0.9501982897283974,ft,0 00:35
+node_depth,J3,max_depth,1.5665857599127284,ft,0 00:35
+node_depth,J4,max_depth,1.1377026447187237,ft,0 00:35
+node_depth,J5,max_depth,1.9787167471249287,ft,0 00:35
+node_depth,J6,max_depth,2.2968689355325456,ft,0 00:35
+node_depth,J7,max_depth,1.3311020791542394,ft,0 00:35
+node_depth,J8,max_depth,2.015525403928784,ft,0 00:36
+node_depth,J9,max_depth,2.5750051572724697,ft,0 00:37
+node_depth,J10,max_depth,2.9144810226359574,ft,0 00:38
+node_depth,J11,max_depth,3.331933837403567,ft,0 00:37
+node_depth,O1,max_depth,3.3320389629741993,ft,0 00:38
