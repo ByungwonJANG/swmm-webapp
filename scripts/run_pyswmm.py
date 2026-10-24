@@ -14,6 +14,6 @@ if __name__ == "__main__":
     for arg in sys.argv[1:]:
         name, inp = arg.split("=", 1)
         csv_path = Path("results") / f"pyswmm_{name}_summary.csv"
-        rows = simulate(Path(inp))
+        rows = simulate(Path(inp)).summary
         rows.to_csv(csv_path, index=False)
         print(f"{inp}: {len(rows)} rows -> {csv_path}")

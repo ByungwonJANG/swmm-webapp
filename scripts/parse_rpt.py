@@ -50,10 +50,11 @@ add("system", "rainfall", "total_precipitation_volume", value(runoff, "Total Pre
 add("system", "runoff", "total_surface_runoff", value(runoff, "Surface Runoff", 1), "in")
 add("system", "runoff", "total_surface_runoff_volume", value(runoff, "Surface Runoff", 0), "ac-ft")
 
+inflow_time = {r[0]: f"{r[4]} {r[5]}" for r in table(section("Node Inflow Summary"))}
 for r in table(section("Outfall Loading Summary")):
     if r[0] == "System":
         continue
-    add("outfall", r[0], "peak_flow", r[3], "CFS")
+    add("outfall", r[0], "peak_flow", r[3], "CFS", inflow_time[r[0]])
     add("outfall", r[0], "total_volume", r[4], "10^6 gal")
 
 for r in table(section("Link Flow Summary")):

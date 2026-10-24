@@ -5,7 +5,7 @@ system,rainfall,total_precipitation,0.978,in,
 system,rainfall,total_precipitation_volume,2.358,ac-ft,
 system,runoff,total_surface_runoff,0.533,in,
 system,runoff,total_surface_runoff_volume,1.285,ac-ft,
-outfall,O1,peak_flow,33.44,CFS,
+outfall,O1,peak_flow,33.44,CFS,0 00:36
 outfall,O1,total_volume,0.418,10^6 gal,
 link,C1,max_flow,7.28,CFS,0 00:35
 link,C2,max_flow,7.16,CFS,0 00:35

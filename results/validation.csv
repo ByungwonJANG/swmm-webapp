@@ -3,7 +3,7 @@ base,continuity,runoff,continuity_error,%,-0.042,-0.0419407,5.93387e-05,0.141283
 base,continuity,flow_routing,continuity_error,%,0.011,0.0114572,0.000457197,4.15633,True,,,True
 base,system,rainfall,total_precipitation,in,0.978,0.978333,0.000333333,0.0340832,True,,,True
 base,system,runoff,total_surface_runoff,in,0.533,0.533396,0.000396256,0.0743445,True,,,True
-base,outfall,O1,peak_flow,CFS,33.44,33.4401,0.000135784,0.000406054,True,,,True
+base,outfall,O1,peak_flow,CFS,33.44,33.4401,0.000135784,0.000406054,True,0 00:36,0 00:36,True
 base,link,C1,max_flow,CFS,7.28,7.28251,0.00251077,0.0344887,True,0 00:35,0 00:35,True
 base,link,C2,max_flow,CFS,7.16,7.15714,-0.00285598,-0.039888,True,0 00:35,0 00:35,True
 base,link,C3,max_flow,CFS,4.24,4.23856,-0.00144101,-0.033986,True,0 00:35,0 00:35,True
@@ -42,7 +42,7 @@ base,node_depth,O1,max_depth,ft,1.33,1.32884,-0.00115519,-0.0868564,True,0 00:36
 10yr,continuity,flow_routing,continuity_error,%,0.009,0.00928145,0.000281448,3.12721,True,,,True
 10yr,system,rainfall,total_precipitation,in,1.711,1.71083,-0.000166667,-0.00974089,True,,,True
 10yr,system,runoff,total_surface_runoff,in,1.108,1.10785,-0.000150696,-0.0136007,True,,,True
-10yr,outfall,O1,peak_flow,CFS,62.28,62.277,-0.00296237,-0.00475654,True,,,True
+10yr,outfall,O1,peak_flow,CFS,62.28,62.277,-0.00296237,-0.00475654,True,0 00:36,0 00:36,True
 10yr,link,C1,max_flow,CFS,12.76,12.7616,0.0015779,0.012366,True,0 00:35,0 00:35,True
 10yr,link,C2,max_flow,CFS,13.05,13.0542,0.00424353,0.0325175,True,0 00:35,0 00:35,True
 10yr,link,C3,max_flow,CFS,7.56,7.55912,-0.000882464,-0.0116728,True,0 00:35,0 00:35,True
@@ -81,7 +81,7 @@ base,node_depth,O1,max_depth,ft,1.33,1.32884,-0.00115519,-0.0868564,True,0 00:36
 100yr,continuity,flow_routing,continuity_error,%,0.01,0.0101846,0.000184611,1.84611,True,,,True
 100yr,system,rainfall,total_precipitation,in,3.669,3.66917,0.000166667,0.00454256,True,,,True
 100yr,system,runoff,total_surface_runoff,in,3.036,3.0363,0.000304934,0.0100439,True,,,True
-100yr,outfall,O1,peak_flow,CFS,164.13,164.129,-0.00101349,-0.000617491,True,,,True
+100yr,outfall,O1,peak_flow,CFS,164.13,164.129,-0.00101349,-0.000617491,True,0 00:38,0 00:38,True
 100yr,link,C1,max_flow,CFS,37.27,37.2671,-0.00293109,-0.00786447,True,0 00:35,0 00:35,True
 100yr,link,C2,max_flow,CFS,36.97,36.9653,-0.00466303,-0.012613,True,0 00:35,0 00:35,True
 100yr,link,C3,max_flow,CFS,28.51,28.5094,-0.000603544,-0.00211696,True,0 00:35,0 00:35,True

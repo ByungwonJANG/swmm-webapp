@@ -3,7 +3,7 @@ continuity,runoff,continuity_error,-0.04194066127691798,%,
 continuity,flow_routing,continuity_error,0.011457196680908499,%,
 system,rainfall,total_precipitation,0.9783333333333365,in,
 system,runoff,total_surface_runoff,0.5333962561108165,in,
-outfall,O1,peak_flow,33.44013578432242,CFS,
+outfall,O1,peak_flow,33.44013578432242,CFS,0 00:36
 link,C1,max_flow,7.282510774508225,CFS,0 00:35
 link,C2,max_flow,7.157144022753629,CFS,0 00:35
 link,C3,max_flow,4.238558992659986,CFS,0 00:35
