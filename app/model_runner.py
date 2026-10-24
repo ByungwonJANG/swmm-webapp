@@ -43,6 +43,11 @@ class Scenario:
     def is_default(self):
         return self.rain_factor == 1.0 and self.imperv_delta == 0.0 and self.roughness_factor == 1.0
 
+    def label(self):
+        """Short condition summary, e.g. '100yr×1.5/+20%p/n×1.3'."""
+        rain = (self.timeseries or "기본강우").replace("-", "")
+        return f"{rain}×{self.rain_factor:g}/{self.imperv_delta:+g}%p/n×{self.roughness_factor:g}"
+
 
 @dataclass
 class ModelInfo:
@@ -280,3 +285,29 @@ def headline(result):
         "flooded_nodes": int((flood.value > 0).sum()),
         "total_flood_volume": to_si(flood.value.sum(), flood.unit.iloc[0]) if len(flood) else (0.0, "m3"),
     }
+
+
+def elapsed_minutes(text):
+    """'days hr:min' -> minutes after the start."""
+    days, hm = text.split()
+    hours, minutes = hm.split(":")
+    return int(days) * 1440 + int(hours) * 60 + int(minutes)
+
+
+def kpis(result):
+    """Scenario comparison figures in SI units (plain numbers)."""
+    h = headline(result)
+    return {
+        "total_runoff": h["total_runoff"][0],  # mm
+        "outfall_peak_flow": h["outfall_peak_flow"][0],  # m3/s
+        "outfall_peak_time": elapsed_minutes(h["outfall_peak_time"]),  # minutes after start
+        "flooded_nodes": h["flooded_nodes"],
+        "total_flood_volume": h["total_flood_volume"][0],  # m3
+        "max_fullness": h["max_fullness"][0],  # %
+    }
+
+
+def node_flood_volumes(result):
+    """Total flood volume per node (m3), from the SWMM summary."""
+    fl = result.summary[result.summary.category == "node_flooding"]
+    return pd.Series([to_si(v, u)[0] for v, u in zip(fl.value, fl.unit)], index=fl.element.values, dtype=float)

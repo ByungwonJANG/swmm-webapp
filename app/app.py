@@ -9,20 +9,43 @@ import streamlit as st
 
 import charts
 import config
-from model_runner import Scenario, headline, model_info, run_scenario, to_si
+from model_runner import Scenario, headline, kpis, model_info, node_flood_volumes, run_scenario, to_si
 
 st.set_page_config(page_title="SWMM 배수 시나리오 분석", layout="wide")
 st.title("SWMM 기반 도시 배수 시나리오 분석")
 
 
+# Bump when the stored result or session layout changes. Older entries are then dropped
+# instead of being read with the new code (a code reload otherwise keeps them).
+STATE_VERSION = 3
+
+if st.session_state.get("state_version") != STATE_VERSION:
+    for key in ("result", "scenarios"):
+        st.session_state.pop(key, None)
+    st.cache_data.clear()
+    st.session_state["state_version"] = STATE_VERSION
+st.session_state.setdefault("scenarios", {})  # name -> {"scenario": dict, "result": RunResult}
+
+
 @st.cache_data
-def load_info(path):
+def load_info(path, version=STATE_VERSION):
     return model_info(path)
 
 
 @st.cache_data(show_spinner=False)
-def run_cached(scenario, path):
-    return run_scenario(scenario, path)
+def run_cached(conditions, path, version=STATE_VERSION):
+    # Plain dict in, so a reloaded Scenario class never misses or mismatches the cache.
+    return run_scenario(Scenario(**conditions), path)
+
+
+def entry(scenario):
+    """Run (or fetch from cache) and package a scenario for session_state."""
+    conditions = asdict(scenario)
+    return {"scenario": conditions, "result": run_cached(conditions, config.MODEL_PATH)}
+
+
+def describe(conditions):
+    return Scenario(**conditions).label()
 
 
 def fmt_elapsed(text):
@@ -54,27 +77,81 @@ with st.sidebar:
                                  help="모든 관로의 Manning n에 곱합니다.")
     run = st.button("모델 실행", type="primary", width="stretch")
 
+    st.divider()
+    st.header("시나리오")
+    batch = st.button("기본 시나리오 일괄 실행", width="stretch",
+                      help="2yr·10yr·100yr 원설계, 100yr 기후변화 ×1.3, 100yr ×1.3·불투수 +20%p·조도 ×1.3 "
+                           "(설정은 config.py). 저장된 시나리오는 이 5개로 바뀝니다.")
+    saved = st.session_state["scenarios"]
+    st.caption(f"저장됨 {len(saved)}/{config.MAX_SAVED_SCENARIOS}")
+    for name in list(saved):
+        c1, c2 = st.columns([5, 1], vertical_alignment="center")
+        c1.markdown(f"**{name}**  \n:gray[{describe(saved[name]['scenario'])}]")
+        if c2.button("✕", key=f"del_{name}", help="삭제"):
+            del saved[name]
+            st.rerun()
+
 scenario = Scenario(timeseries, rain_factor, imperv_delta, roughness_factor)
+
+if "flash" in st.session_state:  # message from the run before an st.rerun()
+    st.toast(st.session_state.pop("flash"))
 
 if run:
     with st.spinner("SWMM 실행 중..."):
         try:
-            st.session_state["result"] = (scenario, run_cached(scenario, config.MODEL_PATH))
+            st.session_state["result"] = entry(scenario)
         except Exception as e:  # engine errors are reported, not raised in the UI
             st.session_state.pop("result", None)
             st.error(f"모델 실행 중 오류가 발생했습니다: {e}")
 
+if batch:
+    done, problems = {}, []
+    progress = st.progress(0.0, "기본 시나리오 실행 중...")
+    for i, (name, ts, rf, di, nf) in enumerate(config.BATCH_SCENARIOS[:config.MAX_SAVED_SCENARIOS]):
+        if ts not in info.timeseries:
+            problems.append(f"{name}: 모델에 시계열 '{ts}'가 없습니다.")
+            continue
+        try:
+            done[name] = entry(Scenario(ts, rf, di, nf))
+        except Exception as e:
+            problems.append(f"{name}: {e}")
+        progress.progress((i + 1) / len(config.BATCH_SCENARIOS), f"{name} 완료")
+    progress.empty()
+    if done:
+        st.session_state["scenarios"] = done
+        st.session_state["result"] = list(done.values())[-1]
+        st.session_state["flash"] = f"기본 시나리오 {len(done)}개를 저장했습니다. [시나리오 비교] 탭에서 비교하세요."
+    for p in problems:
+        st.error(p)
+    if done:
+        st.rerun()
+
 if "result" not in st.session_state:
-    st.info("왼쪽에서 조건을 정하고 **모델 실행**을 누르세요.")
+    st.info("왼쪽에서 조건을 정하고 **모델 실행**을 누르거나, **기본 시나리오 일괄 실행**을 누르세요.")
     st.stop()
 
-# Everything below only reads the stored result, so changing views never re-runs the model.
-ran, result = st.session_state["result"]
-if asdict(ran) != asdict(scenario):  # by value: a code reload redefines the Scenario class
+# Everything below only reads stored results, so changing views never re-runs the model.
+current = st.session_state["result"]
+ran, result = Scenario(**current["scenario"]), current["result"]
+if asdict(ran) != asdict(scenario):
     st.warning("조건이 바뀌었습니다. 아래 결과는 이전 조건으로 실행한 것입니다.")
 st.subheader("실행 결과")
 st.caption(f"강우 {ran.timeseries} × {ran.rain_factor:.2f} · 불투수율 {ran.imperv_delta:+.0f}%p · "
            f"조도 × {ran.roughness_factor:.2f}")
+
+with st.form("save_scenario", border=False):
+    c1, c2 = st.columns([4, 1], vertical_alignment="bottom")
+    save_name = c1.text_input("시나리오 이름", value=ran.label(), key=f"save_name_{ran.label()}")
+    if c2.form_submit_button("시나리오로 저장", width="stretch"):
+        saved = st.session_state["scenarios"]
+        save_name = save_name.strip() or ran.label()
+        if save_name not in saved and len(saved) >= config.MAX_SAVED_SCENARIOS:
+            st.error(f"시나리오는 최대 {config.MAX_SAVED_SCENARIOS}개까지 저장됩니다. 왼쪽에서 하나를 지운 뒤 저장하세요.")
+        else:
+            replaced = save_name in saved
+            saved[save_name] = current
+            st.session_state["flash"] = f"'{save_name}' 시나리오를 {'덮어썼습니다' if replaced else '저장했습니다'}."
+            st.rerun()
 
 h = headline(result)
 row1, row2 = st.columns(4), st.columns(4)
@@ -106,7 +183,8 @@ else:
     # Part of the run: integrate the report-step flooding rates.
     flood_volume = period["node_flooding"].sum() * step_s
 
-tab_hydro, tab_map, tab_point, tab_table = st.tabs(["수문곡선", "관망도", "지점별 결과", "결과표"])
+tab_hydro, tab_map, tab_point, tab_table, tab_compare = st.tabs(
+    ["수문곡선", "관망도", "지점별 결과", "결과표", "시나리오 비교"])
 
 with tab_hydro:
     st.plotly_chart(charts.hydrograph(period["rainfall"], period["outfall_flow"]), width="stretch")
@@ -189,3 +267,66 @@ with tab_table:
         st.dataframe(links.round(3), hide_index=True, width="stretch")
         st.download_button("관로 결과 CSV", links.to_csv(index=False).encode("utf-8-sig"),
                            "link_results.csv", "text/csv")
+
+with tab_compare:
+    saved = st.session_state["scenarios"]
+    if len(saved) < 2:
+        st.info("비교하려면 시나리오가 2개 이상 필요합니다. 결과 위의 **시나리오로 저장**을 누르거나, "
+                "왼쪽의 **기본 시나리오 일괄 실행**을 누르세요.")
+    else:
+        names = st.multiselect("비교할 시나리오 (2~5개)", list(saved), default=list(saved),
+                               max_selections=config.MAX_SAVED_SCENARIOS)
+        if len(names) < 2:
+            st.warning("시나리오를 2개 이상 고르세요.")
+        else:
+            base = st.selectbox("기준 시나리오", names, help="증감은 이 시나리오 대비로 계산합니다.")
+            metrics = [  # (key, column, kind of change)
+                ("total_runoff", "총 유출량 (mm)", "pct"),
+                ("outfall_peak_flow", "첨두유량 (㎥/s)", "pct"),
+                ("outfall_peak_time", "첨두시각", "minutes"),
+                ("flooded_nodes", "월류 노드 수 (개)", "count"),
+                ("total_flood_volume", "총 월류량 (㎥)", "pct"),
+                ("max_fullness", "최대 충만도 (%)", "pct"),
+            ]
+            values = {n: kpis(saved[n]["result"]) for n in names}
+
+            def change(kind, v, b):
+                if kind == "minutes":
+                    return f"{v - b:+d}분"
+                if kind == "count":
+                    return f"{v - b:+d}개"
+                if b == 0:
+                    return "0%" if v == 0 else "신규 발생"
+                return f"{(v - b) / abs(b) * 100:+.1f}%"
+
+            table = pd.DataFrame([{
+                "시나리오": n,
+                "조건": describe(saved[n]["scenario"]),
+                **{col: (f"{values[n][k] // 60:02d}:{values[n][k] % 60:02d}" if kind == "minutes" else values[n][k])
+                   for k, col, kind in metrics},
+            } for n in names])
+            deltas = pd.DataFrame([{
+                "시나리오": n,
+                **{col: ("기준" if n == base else change(kind, values[n][k], values[base][k]))
+                   for k, col, kind in metrics},
+            } for n in names])
+
+            st.markdown("**KPI 비교**")
+            st.dataframe(table.round(2), hide_index=True, width="stretch")
+            st.markdown(f"**기준(`{base}`) 대비 증감**")
+            st.dataframe(deltas, hide_index=True, width="stretch")
+            st.download_button("비교표 CSV", table.merge(deltas, on="시나리오", suffixes=("", " 증감"))
+                               .to_csv(index=False).encode("utf-8-sig"), "scenario_comparison.csv", "text/csv")
+
+            st.markdown("**방류구 유량 비교** (방류구가 여럿이면 합계)")
+            flows = {n: saved[n]["result"].series["outfall_flow"].sum(axis=1) for n in names}
+            st.plotly_chart(charts.outfall_comparison(flows), width="stretch")
+
+            st.markdown("**노드별 월류량**")
+            volumes = pd.DataFrame({n: node_flood_volumes(saved[n]["result"]) for n in names}).fillna(0.0)
+            volumes = volumes[volumes.max(axis=1) > 0]
+            if volumes.empty:
+                st.info("고른 시나리오에서는 월류가 생긴 노드가 없습니다.")
+            else:
+                volumes = volumes.loc[volumes.max(axis=1).sort_values(ascending=False).index]
+                st.plotly_chart(charts.flood_comparison(volumes), width="stretch")

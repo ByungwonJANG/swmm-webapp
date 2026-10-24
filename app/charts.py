@@ -99,6 +99,32 @@ def element_series(frames):
     return fig
 
 
+def outfall_comparison(flows):
+    """Total outfall flow of several scenarios on one axis. flows: {name: Series (m3/s)}."""
+    fig = go.Figure()
+    for name, s in flows.items():
+        fig.add_scatter(x=s.index, y=s.values, mode="lines", name=name,
+                        hovertemplate="%{x|%H:%M}<br>%{y:.3f} ㎥/s<extra>" + name + "</extra>")
+    fig.update_yaxes(title_text="방류구 유량 (㎥/s)", rangemode="tozero")
+    fig.update_xaxes(title_text="시각", tickformat="%H:%M")
+    fig.update_layout(height=460, hovermode="x unified", margin=dict(t=30, b=110, l=60, r=20),
+                      legend=dict(orientation="h", yanchor="top", y=-0.22))
+    return fig
+
+
+def flood_comparison(volumes):
+    """Grouped bars of flood volume per node. volumes: DataFrame, index node, one column per scenario (m3)."""
+    fig = go.Figure()
+    for name in volumes.columns:
+        fig.add_bar(x=volumes.index, y=volumes[name], name=name,
+                    hovertemplate="%{x}<br>%{y:,.1f} ㎥<extra>" + name + "</extra>")
+    fig.update_yaxes(title_text="월류량 (㎥)", rangemode="tozero")
+    fig.update_xaxes(title_text="노드", type="category")
+    fig.update_layout(height=460, barmode="group", margin=dict(t=30, b=110, l=60, r=20),
+                      legend=dict(orientation="h", yanchor="top", y=-0.22))
+    return fig
+
+
 def _midpoint(path):
     """Point halfway along a polyline."""
     pts = np.array(path, dtype=float)

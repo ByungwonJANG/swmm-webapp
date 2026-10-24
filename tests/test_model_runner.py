@@ -10,7 +10,7 @@ from swmm_api import read_inp_file
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "app"))
 from config import MODEL_PATH  # noqa: E402
-from model_runner import Scenario, build_inp, model_info, run_scenario, simulate  # noqa: E402
+from model_runner import Scenario, build_inp, kpis, model_info, run_scenario, simulate  # noqa: E402
 
 
 def sha(path):
@@ -103,6 +103,14 @@ def test_locale_failure_does_not_change_results():
         pd.testing.assert_frame_equal(run_scenario(scenario).summary, expected)
     finally:
         locale.setlocale = real
+
+
+def test_label_and_kpis():
+    assert Scenario("100-yr", 1.5, 20, 1.3).label() == "100yr×1.5/+20%p/n×1.3"
+    assert Scenario("2-yr").label() == "2yr×1/+0%p/n×1"
+    k = kpis(simulate(MODEL_PATH))
+    assert k["outfall_peak_time"] == 36 and k["flooded_nodes"] == 0 and k["total_flood_volume"] == 0
+    assert abs(k["outfall_peak_flow"] - 33.44 * 0.028316846592) < 0.001
 
 
 if __name__ == "__main__":
